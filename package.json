@@ -57,7 +57,15 @@
     "sinon-chai": "^2.8.0",
     "xo": "^0.17.1",
     "yeoman-assert": "^2.2.2",
-    "yeoman-test": "^1.6.0"
+    "yeoman-test": "^1.6.0",
+    "compression": "^1.6.2",
+    "cors": "^2.8.1",
+    "helmet": "^3.4.0",
+    "loopback-boot": "^2.23.0",
+    "serve-favicon": "^2.3.2",
+    "strong-error-handler": "^1.1.1",
+    "loopback-component-explorer": "^4.0.0",
+    "loopback": "^3.2.1"
   },
   "nyc": {
     "reporter": [
