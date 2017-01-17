@@ -27,6 +27,9 @@ module.exports = class extends Generator {
 
 	prompting() {
 		return PromiseA.resolve(this.prompt(prompts('app', this))).then(answers => {
+			if (answers.update) {
+				Object.assign(answers, this.answers);
+			}
 			this.props = _.omitBy(answers, value => _.isNil(value));
 		});
 	}
