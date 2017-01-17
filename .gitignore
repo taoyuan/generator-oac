@@ -6,4 +6,4 @@ node_modules
 .nyc_output
 coverage
 test/client/**
-!test/client/.client
+!test/client/.readme

@@ -40,10 +40,12 @@
   "devDependencies": {
     "axios": "^0.15.3",
     "chai": "^3.5.0",
+    "chai-as-promised": "^6.0.0",
     "coveralls": "^2.11.15",
     "debug": "^2.6.0",
     "eslint": "^3.13.1",
     "eslint-config-airbnb": "^14.0.0",
+    "eslint-config-loopback": "^7.0.1",
     "eslint-plugin-import": "^2.2.0",
     "eslint-plugin-jsx-a11y": "^3.0.2",
     "eslint-plugin-mocha": "^4.8.0",

@@ -38,6 +38,9 @@ class Requestor {
 	}
 
 	auth(auth) {
+	  if (typeof auth === 'string') {
+	    auth = {token: auth};
+		}
 		this.__auth = auth;
 	}
 
@@ -69,9 +72,9 @@ class Requestor {
 	_getRequestHeaders(headers = {}) {
 		if (this.__auth && !this.__auth.query && this.__auth.token) {
 			if (this.__auth.name) {
-				headers[name] = this.__auth.token;
+				headers[this.__auth.name] = this.__auth.token;
 			} else {
-				headers['Authorization'] = 'Bearer ' + this.__auth.token;
+				headers['Authorization'] = this.__auth.token;
 			}
 		}
 		return headers;
@@ -108,22 +111,19 @@ class Requestor {
 		const responseType = raw ? 'text' : 'json';
 
 		headers = this._getRequestHeaders(headers);
-		if (typeof(data) === 'object' && data.constructor.name !== 'Buffer') {
-			headers['Content-Type'] = 'application/json';
-		}
 		if (form) data = qs.stringify(form);
 
 		const config = {url, method, headers, params, data, responseType};
 
 		log(`${method} to ${url}`);
-		return axios.request(config).then(res => {
-			if (res.data) {
-				return res.data;
+		return axios.request(config).then(response => {
+			if (response.data) {
+				return response.data;
 			}
-			if (res.statusCode === 204) {
-				return {res: res};
+			if (response.statusCode === 204) {
+				return {response: response};
 			}
-			return {res: res, body: res.body};
+			return {response: response, body: response.body};
 		});
 	}
 }

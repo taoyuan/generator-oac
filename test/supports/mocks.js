@@ -4,7 +4,7 @@ const path = require('path');
 
 exports.prompt = (name, opts) => {
 	const prompts = {
-		app : {
+		app: {
 			appName: 'mockclient',
 			githubAccount: 'loremipsum',
 			authorName: 'lorem ipsum',

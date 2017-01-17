@@ -22,6 +22,14 @@ module.exports = function (baseUrl, opts) {
 	const client = {};
 	const requestor = client.requestor = new Requestor(opts);
 
+	client.auth = client.authenticate = function (options) {
+		requestor.auth(options);
+	};
+
+	client.configure = function (options) {
+		requestor.configure(options);
+	};
+
 	<% services.forEach(s => {-%>
 	client.<%-s.camelCaseName%> = new <%-s.name%>(requestor);
 	<% }) -%>
