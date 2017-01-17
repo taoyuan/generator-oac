@@ -1,8 +1,7 @@
 {
-  "private": true,
   "name": "generator-oac",
-  "version": "0.0.0",
-  "description": "A Swagger Code Generator",
+  "version": "0.1.0",
+  "description": "An Open API Codegen",
   "main": "index.js",
   "jsnext:main": "./src/index.js",
   "scripts": {
