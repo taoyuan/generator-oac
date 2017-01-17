@@ -14,18 +14,18 @@ describe('oac:api', () => {
 		return assert.isRejected(s.client.user.findById(s.users.tom.id), /status code 401/);
 	});
 
-	it('should not get user with header token', () => {
+	it('should get user with header token', () => {
 		const tom = s.users.tom;
-		s.client.auth(token);
+		s.client.authenticate(token);
 		return s.client.user.findById(tom.id).then(user => {
 			assert.isObject(user);
 			assert.propertyVal(user, 'email', tom.email);
 		});
 	});
 
-	it('should not get user with query token', () => {
+	it('should get user with query token', () => {
 		const tom = s.users.tom;
-		s.client.auth({query: true, token});
+		s.client.authenticate({query: true, token});
 		return s.client.user.findById(tom.id).then(user => {
 			assert.isObject(user);
 			assert.propertyVal(user, 'email', tom.email);

@@ -26,7 +26,7 @@ class Requestor {
 	 * @param {String} [opts.apiBase=<%- baseUrl %>] - the base API URL
 	 */
 	constructor(opts = {}) {
-		this.__auth = {};
+		this.__auth = null;
 		this.configure(opts);
 	}
 
@@ -57,7 +57,7 @@ class Requestor {
 			url = this.__apiBase + path;
 		}
 
-		if (this.__auth.query) {
+		if (this.__auth && this.__auth.query) {
 			url += '?' + (this.__auth.name || 'access_token') + '=' + this.__auth.token;
 		}
 		return url;
