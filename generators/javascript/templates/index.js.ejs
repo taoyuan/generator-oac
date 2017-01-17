@@ -1,0 +1,30 @@
+<%- include('licenseInfo') -%>
+'use strict';
+
+const Requestor = require('./lib/_requestor');
+<% services.forEach(s => {-%>
+const <%-s.name%> = require('./lib/<%-s.name%>');
+<% }) -%>
+/**
+ * <%-description%>
+ *
+ * @param {String|Object} [baseUrl]
+ * @param {Object} [opts]
+ */
+module.exports = function (baseUrl, opts) {
+	if (typeof baseUrl === 'object') {
+	  opts = baseUrl;
+	  baseUrl = undefined;
+	}
+	opts = opts || {};
+	opts.baseUrl = opts.baseUrl || baseUrl;
+
+	const client = {};
+	const requestor = client.requestor = new Requestor(opts);
+
+	<% services.forEach(s => {-%>
+	client.<%-s.camelCaseName%> = new <%-s.name%>(requestor);
+	<% }) -%>
+
+	return client;
+};

@@ -1,0 +1,94 @@
+<%- include('../licenseInfo') -%>
+'use strict';
+
+const utils = require('./_utils');
+
+/*jshint -W069 */
+/**
+ * @class <%- name %>
+ * @alias module:api/<%- name %>
+ * @param {Requestor} [requestor] - The project domain or options object. If object, see the object's optional properties.
+ */
+class <%- serviceName %> {
+	constructor(requestor) {
+		this.requestor = requestor;
+	}
+	<% methods.forEach(m => { -%>
+	/**
+	 * <%-m.summary%>
+	 *
+	 * @method
+	 * @path <%-m.path%>
+	 * @name <%-serviceName%>#<%-m.methodName%>
+	 <%m.requiredParams.forEach(p => {-%>
+	 <%if (!p.isSingleton) {%> * @param {<%-p.type%>} <%-p.camelCaseName%> - <%-p.description%><%}%>
+	 <%})-%>
+	 <%if (m.hasOptionalParameter) {-%>
+	 * @param {object|function|*} [opts] - Optional params
+	 <%m.optionalParams.forEach(p => {-%>
+	 <%if (!p.isSingleton) {%> * @param {<%-p.type||'object'%>} [opts.<%-p.camelCaseName%>] - <%-p.description || p.camelCaseName%><%}%>
+	 <%})-%>
+	 <%}-%>
+	 * @param {function} [cb] - Callback function
+	 */
+	<%- m.methodName %>(<%m.requiredParams.forEach(p => {-%>
+		<%if (!p.isSingleton) {%><%-p.camelCaseName%>, <%}-%>
+		<%}) -%><%if (m.hasOptionalParameter) {-%>opts, <%}-%>cb) {
+		<%m.parameters.forEach(p => { -%>
+			<%if (p.required) { -%>
+		// verify the required parameter '<%-p.name%>' is set
+		if (<%-p.camelCaseName%> === undefined || <%-p.camelCaseName%> === null) {
+			throw new Error("Missing the required parameter '<%-p.camelCaseName%>' when calling <%-m.methodName%>");
+		}
+			<%} -%>
+		<%}) -%>
+		<%if (m.hasOptionalParameter) {-%>
+		if (typeof opts === 'function') {
+			cb = opts;
+			opts = null;
+		}
+		opts = opts || {};
+		<%}-%>
+
+		const req = {method: '<%-m.method-%>', headers: {}};
+
+		<%if (m.headers) m.headers.forEach(header => {-%>
+		req.headers['<%-header.name%>'] = <%-header.value%>;
+		<%})-%>
+
+		<%if (m.headerParams.length) {-%>
+		<% m.headerParams.forEach(p =>{-%>
+		req.headers['<%-p.name%>'] = <% if (p.required) {%><%-p.camelCaseName%><% } else { %>opts['<%-p.camelCaseName%>']<%}-%>,
+		<% })%>
+		<%}-%>
+
+		<%if (m.queryParams.length) {-%>
+		req.params = {<% m.queryParams.forEach(p =>{-%>
+		<%-p.name%>: <% if (p.required) {%><%-p.camelCaseName%><% } else { %>opts['<%-p.camelCaseName%>']<%}-%>,
+		<% })%>};
+		<%}-%>
+		<%if (m.formParams.length) {-%>
+		req.form = {<% m.formParams.forEach(p =>{-%>
+		<%-p.name%>: <% if (p.required) {%><%-p.camelCaseName%><% } else { %>opts['<%-p.camelCaseName%>']<%}-%>,
+		<% })%>};
+		<%}-%>
+		<% if (m.bodyParam) { -%>
+		req.data = <%if (m.bodyParam.required) {%><%- m.bodyParam.camelCaseName%><%} else {%>opts['<%- m.bodyParam.camelCaseName%>']<% } %>;
+		<% } -%>
+
+		const path = <%if (m.pathParams.length) {%>utils.buildPath('<%-m.path-%>', {<% m.pathParams.forEach(p =>{-%>
+		<%-p.name%>: <% if (p.required) {%><%-p.camelCaseName%><% } else { %>opts['<%-p.camelCaseName%>']<%}-%>,
+		<% })%>})<%} else {%>'<%-m.path-%>'<%}-%>;
+
+		return this.requestor.request(path, req).then(function(result) {
+			if (!cb) return result;
+			cb(result);
+		}, function (err) {
+		  if (!cb) throw err;
+			cb(null, err);
+		});
+	}
+	<% }) -%>
+}
+
+module.exports = <%- serviceName%>;

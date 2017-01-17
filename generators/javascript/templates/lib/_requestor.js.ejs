@@ -1,0 +1,131 @@
+<%- include('../licenseInfo') -%>
+'use strict';
+
+const axios = require("axios");
+const debug = require("debug");
+const qs = require('qs');
+
+const log = debug('<%- appName %>:request');
+
+/**
+ * Requestor wraps the logic for making http requests to the API
+ */
+class Requestor {
+	/**
+	 * Either a username and password or an oauth token for Github
+	 * @typedef {Object} Requestor.auth
+	 * @prop {token} [token] - an OAuth token
+	 * @prop {String} [username] - the Github username
+	 * @prop {String} [password] - the user's password
+	 */
+	/**
+	 * Initialize the http internals.
+	 * @param {Object} opts
+	 * @param {Requestor.auth} [opts.auth] - the credentials to authenticate to Github. If auth is
+	 *   not provided request will be made unauthenticated
+	 * @param {String} [opts.apiBase=<%- baseUrl %>] - the base API URL
+	 */
+	constructor(opts = {}) {
+		this.__auth = {};
+		this.configure(opts);
+	}
+
+	configure(opts = {}) {
+		this.__apiBase = opts.base || opts.baseUrl || this.__apiBase || '<%- baseUrl %>';
+		if (opts.auth) {
+			this.auth(opts.auth);
+		}
+	}
+
+	auth(auth) {
+		this.__auth = auth;
+	}
+
+	/**
+	 * Compute the URL to use to make a request.
+	 * @private
+	 * @param {String} path - either a URL relative to the API base or an absolute URL
+	 * @return {String} - the URL to use
+	 */
+	_getURL(path) {
+		let url = path;
+
+		if (path.indexOf('//') === -1) {
+			url = this.__apiBase + path;
+		}
+
+		if (this.__auth.query) {
+			url += '?' + (this.__auth.name || 'access_token') + '=' + this.__auth.token;
+		}
+		return url;
+	}
+
+	/**
+	 * Compute the headers required for an API request.
+	 * @private
+	 * @param {Object} [headers] - the accept header for the request
+	 * @return {Object} - the headers to use in the request
+	 */
+	_getRequestHeaders(headers = {}) {
+		if (this.__auth && !this.__auth.query && this.__auth.token) {
+			if (this.__auth.name) {
+				headers[name] = this.__auth.token;
+			} else {
+				headers['Authorization'] = 'Bearer ' + this.__auth.token;
+			}
+		}
+		return headers;
+	}
+
+	/**
+	 * A function that receives the result of the API request.
+	 * @callback Requestor.callback
+	 * @param {Requestor.Error} error - the error returned by the API or `null`
+	 * @param {(Object|true)} result - the data returned by the API or `true` if the API returns `204 No Content`
+	 * @param {Object} request - the raw {@linkcode https://github.com/mzabriskie/axios#response-schema Response}
+	 */
+	/**
+	 * Make a request.
+	 * @param {String|Object} path - the path for the request
+	 * @param {Object} options
+	 * @param {String} [options.path] - the method for the request (GET, PUT, POST, DELETE)
+	 * @param {String} options.method - the method for the request (GET, PUT, POST, DELETE)
+	 * @param {*} [options.data] - the data to send to the server. For HTTP methods that don't have a body the data
+	 *   will be sent as query parameters
+	 * @param {*} [options.form]
+	 * @param {boolean} [options.raw=false] - if the request should be sent as raw. If this is a falsy value then the
+	 *   request will be made as JSON
+	 * @return {Promise} - the Promise for the http request
+	 */
+	request(path, options = {}) {
+		if (typeof path === 'object') {
+			options = path;
+			path = options.path;
+		}
+		let {method, headers, params, data, form, raw} = options;
+
+		const url = this._getURL(path);
+		const responseType = raw ? 'text' : 'json';
+
+		headers = this._getRequestHeaders(headers);
+		if (typeof(data) === 'object' && data.constructor.name !== 'Buffer') {
+			headers['Content-Type'] = 'application/json';
+		}
+		if (form) data = qs.stringify(form);
+
+		const config = {url, method, headers, params, data, responseType};
+
+		log(`${method} to ${url}`);
+		return axios.request(config).then(res => {
+			if (res.data) {
+				return res.data;
+			}
+			if (res.statusCode === 204) {
+				return {res: res};
+			}
+			return {res: res, body: res.body};
+		});
+	}
+}
+
+module.exports = Requestor;
