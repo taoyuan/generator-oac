@@ -7,9 +7,12 @@ const chalk = require('chalk');
 const yosay = require('yosay');
 const gitConfig = require('git-config');
 const beautify = require('gulp-beautify');
+const gulpif = require('gulp-if');
 const prompts = require('../prompts');
 const utils = require('../utils');
 const decoders = require('../../lib/decoders');
+
+const jsexts = ['.js.ejs', '.js', '.json.ejs', '.json'];
 
 module.exports = class extends Generator {
 
@@ -22,7 +25,9 @@ module.exports = class extends Generator {
 	}
 
 	initializing() {
-		this.registerTransformStream(beautify({indent_size: 2, max_preserve_newlines: 2}));
+		this.registerTransformStream(
+			gulpif(f => _.find(jsexts, ext => f.path.endsWith(ext)), beautify({indent_size: 2, max_preserve_newlines: 2}))
+		);
 	}
 
 	prompting() {

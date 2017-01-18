@@ -47,5 +47,10 @@ module.exports = class extends Generator {
 			this.templatePath('package.json.ejs'),
 			this.destinationPath('package.json'),
 			context);
+
+		this.fs.copyTpl(
+			this.templatePath('.gitignore'),
+			this.destinationPath('.gitignore'),
+			context);
 	}
 };
