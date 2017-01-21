@@ -3,6 +3,7 @@
 
 const axios = require("axios");
 const debug = require("debug");
+const qs = require('qs');
 
 const log = debug('<%- appName %>:request');
 
@@ -112,7 +113,7 @@ class Requestor {
 		headers = this._getRequestHeaders(headers);
 		if (form) {
 		  headers['Content-Type'] = 'application/x-www-form-urlencoded';
-		  data = form;
+		  data = qs.stringify(form);
 		}
 
 		const config = {url, method, headers, params, data, responseType};
