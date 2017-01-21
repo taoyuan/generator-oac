@@ -18,7 +18,7 @@ class <%- serviceName %> {
 	 * <%-m.summary%>
 	 *
 	 * @method
-	 * @path <%-m.path%>
+	 * @path [<%-m.method%>] <%-m.path%>
 	 * @name <%-serviceName%>#<%-m.methodName%>
 	 <%m.requiredParams.forEach(p => {-%>
 	 <%if (!p.isSingleton) {%> * @param {<%-p.type%>} <%-p.camelCaseName%> - <%-p.description%><%}%>

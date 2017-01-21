@@ -111,7 +111,10 @@ class Requestor {
 		const responseType = raw ? 'text' : 'json';
 
 		headers = this._getRequestHeaders(headers);
-		if (form) data = qs.stringify(form);
+		if (form) {
+		  headers['Content-Type'] = 'application/x-www-form-urlencoded';
+		  data = qs.stringify(form);
+		}
 
 		const config = {url, method, headers, params, data, responseType};
 
