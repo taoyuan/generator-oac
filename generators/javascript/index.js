@@ -1,6 +1,5 @@
 const Generator = require('yeoman-generator');
 const _ = require('lodash');
-const PromiseA = require('bluebird');
 const chalk = require('chalk');
 const yosay = require('yosay');
 const prompts = require('../prompts');
@@ -47,7 +46,7 @@ module.exports = class extends Generator {
 			context);
 
 		this.fs.copyTpl(
-			this.templatePath('.gitignore'),
+			this.templatePath('_gitignore'),
 			this.destinationPath('.gitignore'),
 			context);
 	}
