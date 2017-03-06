@@ -1,6 +1,6 @@
 {
   "name": "generator-oac",
-  "version": "0.1.8",
+  "version": "0.1.9",
   "description": "An Open API Codegen",
   "main": "index.js",
   "jsnext:main": "./src/index.js",
