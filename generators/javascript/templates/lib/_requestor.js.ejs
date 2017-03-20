@@ -30,10 +30,19 @@ class Requestor {
 	}
 
 	configure(opts = {}) {
-		this.__apiBase = opts.base || opts.baseUrl || this.__apiBase || '<%- baseUrl %>';
+	  opts = this.__opts = Object.assign({}, this.__opts, opts);
+		opts.baseURL = opts.baseURL || opts.baseUrl || opts.base || '<%- baseUrl %>';
 		if (opts.auth) {
 			this.auth(opts.auth);
 		}
+		this.__fetch = axios.create(opts);
+	}
+
+	/**
+	 * @property defaults defaults for axios instance
+	 */
+	get defaults() {
+	  return this.__fetch.defaults;
 	}
 
 	auth(auth) {
@@ -41,25 +50,6 @@ class Requestor {
 	    auth = {token: auth};
 		}
 		this.__auth = auth;
-	}
-
-	/**
-	 * Compute the URL to use to make a request.
-	 * @private
-	 * @param {String} path - either a URL relative to the API base or an absolute URL
-	 * @return {String} - the URL to use
-	 */
-	_getURL(path) {
-		let url = path;
-
-		if (path.indexOf('//') === -1) {
-			url = this.__apiBase + path;
-		}
-
-		if (this.__auth && this.__auth.query) {
-			url += '?' + (this.__auth.name || 'access_token') + '=' + this.__auth.token;
-		}
-		return url;
 	}
 
 	/**
@@ -106,7 +96,12 @@ class Requestor {
 		}
 		let {method, headers, params, data, form, raw} = options;
 
-		const url = this._getURL(path);
+		if (this.__auth && this.__auth.query) {
+			params = params || {};
+			params[this.__auth.name || 'access_token'] = this.__auth.token;
+		}
+
+		const url = path;
 		const responseType = raw ? 'text' : 'json';
 
 		headers = this._getRequestHeaders(headers);
@@ -118,7 +113,7 @@ class Requestor {
 		const config = {url, method, headers, params, data, responseType};
 
 		log(`${method} to ${url}`);
-		return axios.request(config).then(response => {
+		return this.__fetch.request(config).then(response => {
 			if (response.data) {
 				return response.data;
 			}
