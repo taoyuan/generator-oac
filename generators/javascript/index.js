@@ -49,5 +49,10 @@ module.exports = class extends Generator {
 			this.templatePath('_gitignore'),
 			this.destinationPath('.gitignore'),
 			context);
+
+		this.fs.copyTpl(
+			this.templatePath('_npmignore'),
+			this.destinationPath('.npmignore'),
+			context);
 	}
 };
